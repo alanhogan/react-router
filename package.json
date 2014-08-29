@@ -1,6 +1,6 @@
 {
   "name": "react-router",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "A complete routing library for React.js",
   "tags": [
     "react",
@@ -12,6 +12,7 @@
     "url": "https://github.com/rackt/react-router.git"
   },
   "homepage": "https://github.com/rackt/react-router",
+  "bugs": "https://github.com/rackt/react-router/issues",
   "directories": {
     "example": "examples"
   },
@@ -48,9 +49,18 @@
   },
   "dependencies": {
     "es6-promise": "^1.0.0",
-    "event-emitter": "^0.3.1",
-    "querystring": "^0.2.0"
+    "events": "^1.0.1",
+    "qs": "^1.2.2",
+    "react-dispatcher": "^0.2.1"
   },
+  "keywords": [
+    "react",
+    "react-component",
+    "routing",
+    "route",
+    "routes",
+    "router"
+  ],
   "browserify-shim": {
     "react": "global:React"
   }

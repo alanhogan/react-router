@@ -9,6 +9,8 @@ var withoutProperties = require('../helpers/withoutProperties');
 var RESERVED_PROPS = {
   handler: true,
   path: true,
+  defaultRoute: true,
+  paramNames: true,
   children: true // ReactChildren
 };
 
@@ -62,6 +64,7 @@ var RESERVED_PROPS = {
  *   });
  */
 var Route = React.createClass({
+
   displayName: 'Route',
 
   statics: {
@@ -72,23 +75,24 @@ var Route = React.createClass({
 
   },
 
-  getDefaultProps: function() {
+  propTypes: {
+    preserveScrollPosition: React.PropTypes.bool.isRequired,
+    handler: React.PropTypes.any.isRequired,
+    path: React.PropTypes.string,
+    name: React.PropTypes.string
+  },
+
+  getDefaultProps: function () {
     return {
       preserveScrollPosition: false
     };
   },
 
-  propTypes: {
-    handler: React.PropTypes.any.isRequired,
-    path: React.PropTypes.string,
-    name: React.PropTypes.string,
-    preserveScrollPosition: React.PropTypes.bool
-  },
-
   render: function () {
     throw new Error(
       'The <Route> component should not be rendered directly. You may be ' +
-      'missing a <Routes> wrapper around your list of routes.');
+      'missing a <Routes> wrapper around your list of routes.'
+    );
   }
 
 });
