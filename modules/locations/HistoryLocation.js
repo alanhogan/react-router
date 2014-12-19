@@ -1,50 +1,87 @@
-var invariant = require('react/lib/invariant');
-var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
-var getWindowPath = require('../helpers/getWindowPath');
+var LocationActions = require('../actions/LocationActions');
+var History = require('../utils/History');
+var Path = require('../utils/Path');
 
-var _onChange;
+/**
+ * Returns the current URL path from `window.location`, including query string.
+ */
+function getWindowPath() {
+  return Path.decode(
+    window.location.pathname + window.location.search
+  );
+}
+
+var _changeListeners = [];
+
+function notifyChange(type) {
+  var change = {
+    path: getWindowPath(),
+    type: type
+  };
+
+  _changeListeners.forEach(function (listener) {
+    listener(change);
+  });
+}
+
+var _isListening = false;
+
+function onPopState() {
+  notifyChange(LocationActions.POP);
+}
 
 /**
  * A Location that uses HTML5 history.
  */
 var HistoryLocation = {
 
-  setup: function (onChange) {
-    invariant(
-      ExecutionEnvironment.canUseDOM,
-      'You cannot use HistoryLocation in an environment with no DOM'
-    );
+  addChangeListener: function (listener) {
+    _changeListeners.push(listener);
 
-    _onChange = onChange;
+    if (_isListening)
+      return;
 
     if (window.addEventListener) {
-      window.addEventListener('popstate', _onChange, false);
+      window.addEventListener('popstate', onPopState, false);
     } else {
-      window.attachEvent('popstate', _onChange);
+      window.attachEvent('popstate', onPopState);
     }
+
+    _isListening = true;
   },
 
-  teardown: function () {
-    if (window.removeEventListener) {
-      window.removeEventListener('popstate', _onChange, false);
-    } else {
-      window.detachEvent('popstate', _onChange);
+  removeChangeListener: function(listener) {
+    for (var i = 0, l = _changeListeners.length; i < l; i ++) {
+      if (_changeListeners[i] === listener) {
+        _changeListeners.splice(i, 1);
+        break;
+      }
     }
+
+    if (window.addEventListener) {
+      window.removeEventListener('popstate', onPopState);
+    } else {
+      window.removeEvent('popstate', onPopState);
+    }
+
+    if (_changeListeners.length === 0)
+      _isListening = false;
   },
+
+
 
   push: function (path) {
-    window.history.pushState({ path: path }, '', path);
-    _onChange();
+    window.history.pushState({ path: path }, '', Path.encode(path));
+    History.length += 1;
+    notifyChange(LocationActions.PUSH);
   },
 
   replace: function (path) {
-    window.history.replaceState({ path: path }, '', path);
-    _onChange();
+    window.history.replaceState({ path: path }, '', Path.encode(path));
+    notifyChange(LocationActions.REPLACE);
   },
 
-  pop: function () {
-    window.history.back();
-  },
+  pop: History.back,
 
   getCurrentPath: getWindowPath,
 

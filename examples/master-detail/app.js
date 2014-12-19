@@ -1,81 +1,16 @@
-/** @jsx React.DOM */
 var React = require('react');
-var Router = require('../../index');
-var Route = Router.Route;
-var DefaultRoute = Router.DefaultRoute;
-var Routes = Router.Routes;
-var Link = Router.Link;
-var NotFoundRoute = Router.NotFoundRoute;
-
-var api = 'http://addressbook-api.herokuapp.com/contacts';
-var _contacts = {};
-var _changeListeners = [];
-var _initCalled = false;
-
-var ContactStore = {
-
-  init: function () {
-    if (_initCalled)
-      return;
-
-    _initCalled = true;
-
-    getJSON(api, function (err, res) {
-      res.contacts.forEach(function (contact) {
-        _contacts[contact.id] = contact;
-      });
-
-      ContactStore.notifyChange();
-    });
-  },
-
-  addContact: function (contact, cb) {
-    postJSON(api, { contact: contact }, function (res) {
-      _contacts[res.contact.id] = res.contact;
-      ContactStore.notifyChange();
-      if (cb) cb(res.contact);
-    });
-  },
-
-  removeContact: function (id, cb) {
-    deleteJSON(api + '/' + id, cb);
-    delete _contacts[id];
-    ContactStore.notifyChange();
-  },
-
-  getContacts: function () {
-    var array = [];
-
-    for (var id in _contacts)
-      array.push(_contacts[id]);
-
-    return array;
-  },
-
-  getContact: function (id) {
-    return _contacts[id];
-  },
-
-  notifyChange: function () {
-    _changeListeners.forEach(function (listener) {
-      listener();
-    });
-  },
-
-  addChangeListener: function (listener) {
-    _changeListeners.push(listener);
-  },
-
-  removeChangeListener: function (listener) {
-    _changeListeners = _changeListeners.filter(function (l) {
-      return listener !== l;
-    });
-  }
-
-};
+var Router = require('react-router');
+var ContactStore = require('./ContactStore');
+var {
+  Route,
+  DefaultRoute,
+  NotFoundRoute,
+  RouteHandler,
+  Link
+} = Router;
 
 var App = React.createClass({
-  getInitialState: function() {
+  getInitialState: function () {
     return {
       contacts: ContactStore.getContacts(),
       loading: true
@@ -86,7 +21,7 @@ var App = React.createClass({
     ContactStore.init();
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     ContactStore.addChangeListener(this.updateContacts);
   },
 
@@ -94,7 +29,7 @@ var App = React.createClass({
     ContactStore.removeChangeListener(this.updateContacts);
   },
 
-  updateContacts: function (contacts) {
+  updateContacts: function () {
     if (!this.isMounted())
       return;
 
@@ -104,9 +39,9 @@ var App = React.createClass({
     });
   },
 
-  render: function() {
-    var contacts = this.state.contacts.map(function(contact) {
-      return <li key={contact.id}><Link to="contact" params={contact}>{contact.first}</Link></li>
+  render: function () {
+    var contacts = this.state.contacts.map(function (contact) {
+      return <li key={contact.id}><Link to="contact" params={contact}>{contact.first}</Link></li>;
     });
     return (
       <div className="App">
@@ -118,7 +53,7 @@ var App = React.createClass({
           <Link to="/nothing-here">Invalid Link (not found)</Link>
         </div>
         <div className="Content">
-          {this.props.activeRouteHandler()}
+          <RouteHandler/>
         </div>
       </div>
     );
@@ -126,24 +61,27 @@ var App = React.createClass({
 });
 
 var Index = React.createClass({
-  render: function() {
+  render: function () {
     return <h1>Address Book</h1>;
   }
 });
 
 var Contact = React.createClass({
-  getStateFromStore: function(props) {
-    props = props || this.props;
+
+  mixins: [ Router.Navigation, Router.State ],
+
+  getStateFromStore: function (id) {
+    id = this.getParams().id;
     return {
-      contact: ContactStore.getContact(props.params.id)
+      contact: ContactStore.getContact(id)
     };
   },
 
-  getInitialState: function() {
+  getInitialState: function () {
     return this.getStateFromStore();
   },
 
-  componentDidMount: function() {
+  componentDidMount: function () {
     ContactStore.addChangeListener(this.updateContact);
   },
 
@@ -151,29 +89,30 @@ var Contact = React.createClass({
     ContactStore.removeChangeListener(this.updateContact);
   },
 
-  componentWillReceiveProps: function(newProps) {
-    this.setState(this.getStateFromStore(newProps));
+  componentWillReceiveProps: function () {
+    this.setState(this.getStateFromStore());
   },
 
   updateContact: function () {
     if (!this.isMounted())
       return;
 
-    this.setState(this.getStateFromStore())
+    this.setState(this.getStateFromStore());
   },
 
-  destroy: function() {
-    ContactStore.removeContact(this.props.params.id);
-    Router.transitionTo('/');
+  destroy: function () {
+    var id = this.getParams().id;
+    ContactStore.removeContact(id);
+    this.transitionTo('/');
   },
 
-  render: function() {
+  render: function () {
     var contact = this.state.contact || {};
     var name = contact.first + ' ' + contact.last;
-    var avatar = contact.avatar || 'http://placekitten.com/50/50';
+    var avatar = contact.avatar || 'http://placecage.com/50/50';
     return (
       <div className="Contact">
-        <img height="50" src={avatar}/>
+        <img height="50" src={avatar} key={avatar}/>
         <h3>{name}</h3>
         <button onClick={this.destroy}>Delete</button>
       </div>
@@ -182,17 +121,20 @@ var Contact = React.createClass({
 });
 
 var NewContact = React.createClass({
-  createContact: function(event) {
+
+  mixins: [ Router.Navigation ],
+
+  createContact: function (event) {
     event.preventDefault();
     ContactStore.addContact({
       first: this.refs.first.getDOMNode().value,
       last: this.refs.last.getDOMNode().value
-    }, function(contact) {
-      Router.transitionTo('contact', { id: contact.id });
-    });
+    }, function (contact) {
+      this.transitionTo('contact', { id: contact.id });
+    }.bind(this));
   },
 
-  render: function() {
+  render: function () {
     return (
       <form onSubmit={this.createContact}>
         <p>
@@ -208,42 +150,10 @@ var NewContact = React.createClass({
 });
 
 var NotFound = React.createClass({
-  render: function() {
+  render: function () {
     return <h2>Not found</h2>;
   }
 });
-
-// Request utils.
-
-function getJSON(url, cb) {
-  var req = new XMLHttpRequest();
-  req.onload = function() {
-    if (req.status === 404) {
-      cb(new Error('not found'));
-    } else {
-      cb(null, JSON.parse(req.response));
-    }
-  };
-  req.open('GET', url);
-  req.send();
-}
-
-function postJSON(url, obj, cb) {
-  var req = new XMLHttpRequest();
-  req.onload = function() {
-    cb(JSON.parse(req.response));
-  };
-  req.open('POST', url);
-  req.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  req.send(JSON.stringify(obj));
-}
-
-function deleteJSON(url, cb) {
-  var req = new XMLHttpRequest();
-  req.onload = cb;
-  req.open('DELETE', url);
-  req.send();
-}
 
 var routes = (
   <Route handler={App}>
@@ -254,8 +164,6 @@ var routes = (
   </Route>
 );
 
-React.renderComponent(
-  <Routes children={routes}/>,
-  document.getElementById('example')
-);
-
+Router.run(routes, function (Handler) {
+  React.render(<Handler/>, document.getElementById('example'));
+});

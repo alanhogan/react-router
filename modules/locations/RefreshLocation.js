@@ -1,6 +1,6 @@
-var invariant = require('react/lib/invariant');
-var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
-var getWindowPath = require('../helpers/getWindowPath');
+var HistoryLocation = require('./HistoryLocation');
+var History = require('../utils/History');
+var Path = require('../utils/Path');
 
 /**
  * A Location that uses full page refreshes. This is used as
@@ -9,26 +9,17 @@ var getWindowPath = require('../helpers/getWindowPath');
  */
 var RefreshLocation = {
 
-  setup: function () {
-    invariant(
-      ExecutionEnvironment.canUseDOM,
-      'You cannot use RefreshLocation in an environment with no DOM'
-    );
-  },
-
   push: function (path) {
-    window.location = path;
+    window.location = Path.encode(path);
   },
 
   replace: function (path) {
-    window.location.replace(path);
+    window.location.replace(Path.encode(path));
   },
 
-  pop: function () {
-    window.history.back();
-  },
+  pop: History.back,
 
-  getCurrentPath: getWindowPath,
+  getCurrentPath: HistoryLocation.getCurrentPath,
 
   toString: function () {
     return '<RefreshLocation>';

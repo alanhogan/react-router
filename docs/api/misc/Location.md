@@ -7,15 +7,9 @@ following methods must be implemented:
 Methods
 -------
 
-### `setup(onChange)`
+### `addChangeListener(listener)`
 
-Called when the router is first setup. Whenever an external actor should
-cause the router to react, call `onChange` (for example, on
-`window.hashchange`).
-
-### `teardown`
-
-Called when the router is torn down.
+Adds a function to the location that should be called when it changes.
 
 ### `push`
 
@@ -32,7 +26,8 @@ Called when the router attempts to go back one entry in the history.
 
 ### `getCurrentPath`
 
-Should return the current path as a string.
+Should return the current URL path, complete with query string (if applicable).
+This method should be ready to go immediately after setup.
 
 ### `toString`
 
@@ -41,26 +36,18 @@ Should return a useful string for logging and debugging.
 Example
 -------
 
-This is a terrible example, you're probably better off looking at the
-implementations in this repository.
+For examples of how to implement your own location, please see the locations
+included in this repository.
+
 
 ```js
 var MyLocation = {
-
-  setup: function (onChange) {},
-
-  teardown: function () {},
-
+  addChangeListener: function (listener) {},
   push: function (path) {},
-
   replace: function (path) {},
-
   pop: function () {},
-
-  getCurrentPath: function () {},
-
-  toString: function () {}
-
+  getCurrentPath: function () {}
 };
-```
 
+Router.run(routes, MyLocation, callback);
+```

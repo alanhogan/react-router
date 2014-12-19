@@ -1,18 +1,5 @@
 var React = require('react');
-var withoutProperties = require('../helpers/withoutProperties');
-
-/**
- * A map of <Route> component props that are reserved for use by the
- * router and/or React. All other props are considered "static" and
- * are passed through to the route handler.
- */
-var RESERVED_PROPS = {
-  handler: true,
-  path: true,
-  defaultRoute: true,
-  paramNames: true,
-  children: true // ReactChildren
-};
+var FakeNode = require('../mixins/FakeNode');
 
 /**
  * <Route> components specify components that are rendered to the page when the
@@ -24,40 +11,29 @@ var RESERVED_PROPS = {
  * "active" and their components are rendered into the DOM, nested in the same
  * order as they are in the tree.
  *
- * Unlike Ember, a nested route's path does not build upon that of its parents.
- * This may seem like it creates more work up front in specifying URLs, but it
- * has the nice benefit of decoupling nested UI from "nested" URLs.
- *
  * The preferred way to configure a router is using JSX. The XML-like syntax is
  * a great way to visualize how routes are laid out in an application.
  *
- *   React.renderComponent((
- *     <Routes handler={App}>
+ *   var routes = [
+ *     <Route handler={App}>
  *       <Route name="login" handler={Login}/>
  *       <Route name="logout" handler={Logout}/>
  *       <Route name="about" handler={About}/>
- *     </Routes>
- *   ), document.body);
- *
- * If you don't use JSX, you can also assemble a Router programmatically using
- * the standard React component JavaScript API.
- *
- *   React.renderComponent((
- *     Routes({ handler: App },
- *       Route({ name: 'login', handler: Login }),
- *       Route({ name: 'logout', handler: Logout }),
- *       Route({ name: 'about', handler: About })
- *     )
- *   ), document.body);
+ *     </Route>
+ *   ];
+ *   
+ *   Router.run(routes, function (Handler) {
+ *     React.render(<Handler/>, document.body);
+ *   });
  *
  * Handlers for Route components that contain children can render their active
- * child route using the activeRouteHandler prop.
+ * child route using a <RouteHandler> element.
  *
  *   var App = React.createClass({
  *     render: function () {
  *       return (
  *         <div class="application">
- *           {this.props.activeRouteHandler()}
+ *           <RouteHandler/>
  *         </div>
  *       );
  *     }
@@ -67,32 +43,13 @@ var Route = React.createClass({
 
   displayName: 'Route',
 
-  statics: {
-
-    getUnreservedProps: function (props) {
-      return withoutProperties(props, RESERVED_PROPS);
-    },
-
-  },
+  mixins: [ FakeNode ],
 
   propTypes: {
-    preserveScrollPosition: React.PropTypes.bool.isRequired,
-    handler: React.PropTypes.any.isRequired,
+    name: React.PropTypes.string,
     path: React.PropTypes.string,
-    name: React.PropTypes.string
-  },
-
-  getDefaultProps: function () {
-    return {
-      preserveScrollPosition: false
-    };
-  },
-
-  render: function () {
-    throw new Error(
-      'The <Route> component should not be rendered directly. You may be ' +
-      'missing a <Routes> wrapper around your list of routes.'
-    );
+    handler: React.PropTypes.func.isRequired,
+    ignoreScrollBehavior: React.PropTypes.bool
   }
 
 });

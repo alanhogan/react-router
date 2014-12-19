@@ -1,10 +1,20 @@
-var invariant = require('react/lib/invariant');
-var ExecutionEnvironment = require('react/lib/ExecutionEnvironment');
-var getWindowPath = require('../helpers/getWindowPath');
+var LocationActions = require('../actions/LocationActions');
+var History = require('../utils/History');
+var Path = require('../utils/Path');
 
+/**
+ * Returns the current URL path from the `hash` portion of the URL, including
+ * query string.
+ */
 function getHashPath() {
-  return window.location.hash.substr(1);
+  return Path.decode(
+    // We can't use window.location.hash here because it's not
+    // consistent across browsers - Firefox will pre-decode it!
+    window.location.href.split('#')[1] || ''
+  );
 }
+
+var _actionType;
 
 function ensureSlash() {
   var path = getHashPath();
@@ -17,11 +27,33 @@ function ensureSlash() {
   return false;
 }
 
-var _onChange;
+var _changeListeners = [];
 
-function handleHashChange() {
-  if (ensureSlash())
-    _onChange();
+function notifyChange(type) {
+  if (type === LocationActions.PUSH)
+    History.length += 1;
+
+  var change = {
+    path: getHashPath(),
+    type: type
+  };
+
+  _changeListeners.forEach(function (listener) {
+    listener(change);
+  });
+}
+
+var _isListening = false;
+
+function onHashChange() {
+  if (ensureSlash()) {
+    // If we don't have an _actionType then all we know is the hash
+    // changed. It was probably caused by the user clicking the Back
+    // button, but may have also been the Forward button or manual
+    // manipulation. So just guess 'pop'.
+    notifyChange(_actionType || LocationActions.POP);
+    _actionType = null;
+  }
 }
 
 /**
@@ -29,41 +61,57 @@ function handleHashChange() {
  */
 var HashLocation = {
 
-  setup: function (onChange) {
-    invariant(
-      ExecutionEnvironment.canUseDOM,
-      'You cannot use HashLocation in an environment with no DOM'
-    );
+  addChangeListener: function (listener) {
+    _changeListeners.push(listener);
 
-    _onChange = onChange;
-
+    // Do this BEFORE listening for hashchange.
     ensureSlash();
 
+    if (_isListening)
+      return;
+
     if (window.addEventListener) {
-      window.addEventListener('hashchange', handleHashChange, false);
+      window.addEventListener('hashchange', onHashChange, false);
     } else {
-      window.attachEvent('onhashchange', handleHashChange);
+      window.attachEvent('onhashchange', onHashChange);
     }
+
+    _isListening = true;
   },
 
-  teardown: function () {
-    if (window.removeEventListener) {
-      window.removeEventListener('hashchange', handleHashChange, false);
-    } else {
-      window.detachEvent('onhashchange', handleHashChange);
+  removeChangeListener: function(listener) {
+    for (var i = 0, l = _changeListeners.length; i < l; i ++) {
+      if (_changeListeners[i] === listener) {
+        _changeListeners.splice(i, 1);
+        break;
+      }
     }
+
+    if (window.removeEventListener) {
+      window.removeEventListener('hashchange', onHashChange, false);
+    } else {
+      window.removeEvent('onhashchange', onHashChange);
+    }
+
+    if (_changeListeners.length === 0)
+      _isListening = false;
   },
+
+
 
   push: function (path) {
-    window.location.hash = path;
+    _actionType = LocationActions.PUSH;
+    window.location.hash = Path.encode(path);
   },
 
   replace: function (path) {
-    window.location.replace(getWindowPath() + '#' + path);
+    _actionType = LocationActions.REPLACE;
+    window.location.replace(window.location.pathname + '#' + Path.encode(path));
   },
 
   pop: function () {
-    window.history.back();
+    _actionType = LocationActions.POP;
+    History.back();
   },
 
   getCurrentPath: getHashPath,

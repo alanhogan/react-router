@@ -1,3 +1,182 @@
+v0.11.6 - Wed, 17 Dec 2014 19:29:53 GMT
+---------------------------------------
+
+- [90cd750](../../commit/90cd750) [fixed] Call all transition hooks on query changes
+
+
+v0.11.5 - Mon, 15 Dec 2014 22:32:38 GMT
+---------------------------------------
+
+- [31e1eb2](../../commit/31e1eb2) [fixed] supportsHistory false negatives on WP 8.1
+- [6417285](../../commit/6417285) [fixed] tearing down location listeners
+- [457d944](../../commit/457d944) [added] Router.History
+- [a07003e](../../commit/a07003e) [fixed] URL hash consistency across browsers
+- [c6aa4d3](../../commit/c6aa4d3) [fixed] Now execute willTransition* hooks even if only query part was changed
+
+
+v0.11.4 - Fri, 28 Nov 2014 16:10:06 GMT
+---------------------------------------
+
+- [b9079c9](../../commit/b9079c9) [added] getPathname to Router.State
+- [91d4380](../../commit/91d4380) [fixed] Abort pending transition on user navigation
+- [5fe6c08](../../commit/5fe6c08) [changed] Don't update scroll if only query has changed
+
+
+v0.11.3 - Thu, 27 Nov 2014 05:29:48 GMT
+---------------------------------------
+
+- [91d4380](../../commit/91d4380) [fixed] Abort pending transition on user navigation
+- [5fe6c08](../../commit/5fe6c08) [changed] Don't update scroll if only query has changed
+
+
+v0.11.2 - Mon, 24 Nov 2014 16:56:52 GMT
+---------------------------------------
+
+- [017363d](../../commit/017363d) [fixed] default redirect path to '*'
+- [187eb0e](../../commit/187eb0e) [fixed] Added missing require statement
+- [5a1ed33](../../commit/5a1ed33) [fixed] Path.decode/encode with query string
+
+
+v0.11.1 - Sat, 22 Nov 2014 15:00:37 GMT
+---------------------------------------
+
+- [b75f648](../../commit/b75f648) [fixed] rendering current handlers before rendering root
+
+
+v0.11.0 - Sat, 22 Nov 2014 06:03:21 GMT
+---------------------------------------
+
+- Everything ... seriously. Please review the [upgrade
+  guide](./UPGRADE_GUIDE.md#010x---011x).
+
+
+v0.10.2 - Fri, 31 Oct 2014 16:23:27 GMT
+---------------------------------------
+
+- [940a0d0](../../commit/940a0d0) [changed] use `Object.assign` instead of `copyProperties`
+- [f8cb7f9](../../commit/f8cb7f9) [changed] use `Object.assign` instead of `merge`
+- [70b442a](../../commit/70b442a) [added] React 0.12 compatibility
+
+
+v0.10.1 - Fri, 31 Oct 2014 15:46:20 GMT
+---------------------------------------
+
+- [70b442a](../../commit/70b442a) [added] React 0.12 compatibility
+
+
+v0.10.0 - Thu, 30 Oct 2014 05:09:44 GMT
+---------------------------------------
+
+- [70b442a](../../commit/70b442a) [added] React 0.12 compatibility
+
+
+v0.9.5 - Thu, 30 Oct 2014 04:50:09 GMT
+--------------------------------------
+
+- [6192285](../../commit/6192285) [added] <Route ignoreScrollBehavior /> to opt out of scroll behavior for itself and descendants
+
+
+v0.9.4 - Mon, 13 Oct 2014 19:53:10 GMT
+--------------------------------------
+
+- [e571c27](../../commit/e571c27) [fixed] Add .active class to `<Link>`s with absolute hrefs
+- [ea5a380](../../commit/ea5a380) [fixed] Make sure onChange is fired at synchronous first render
+- [dee374f](../../commit/dee374f) [fixed] Listen to path changes caused by initial redirect, fixes #360
+- [d47d7dd](../../commit/d47d7dd) [fixed] potential infinite loop during transitions
+- [1b1a62b](../../commit/1b1a62b) [added] Server-side rendering
+- [c7ca87e](../../commit/c7ca87e) [added] `<Routes onError>`
+
+
+v0.9.3 - Wed, 08 Oct 2014 14:44:52 GMT
+--------------------------------------
+
+- [caf3a2b](../../commit/caf3a2b) [fixed] scrollBehavior='none' on path update
+
+
+v0.9.2 - Wed, 08 Oct 2014 05:33:30 GMT
+--------------------------------------
+
+- [d57f830](../../commit/d57f830) [changed] Public interface for Location objects
+- [6723dc5](../../commit/6723dc5) [added] ability to set params/query in Redirect
+- [60f9eb4](../../commit/60f9eb4) [fixed] encoded ampersands in query params
+- [668773c](../../commit/668773c) [fixed] transitioning to paths with .
+
+
+v0.9.1 - Mon, 06 Oct 2014 20:55:32 GMT
+--------------------------------------
+
+- [76fe696](../../commit/76fe696) [fixed] trailing comma
+
+
+v0.9.0 - Mon, 06 Oct 2014 19:37:27 GMT
+--------------------------------------
+
+- [5aae2a8](../../commit/5aae2a8) [added] onChange event to Routes
+- [ba65269](../../commit/ba65269) [removed] AsyncState
+- [4d8c7a1](../../commit/4d8c7a1) [removed] `<Routes onTransitionError>`
+- [4d8c7a1](../../commit/4d8c7a1) [removed] `<Routes onAbortedTransition>`
+- [ed0cf62](../../commit/ed0cf62) [added] Navigation mixin for components that need to modify the URL
+- [ed0cf62](../../commit/ed0cf62) [added] CurrentPath mixin for components that need to know the current URL path
+- [ed0cf62](../../commit/ed0cf62) [added] getActiveRoutes, getActiveParams, and getActiveQuery methods to ActiveState mixin
+- [ed0cf62](../../commit/ed0cf62) [removed] Awkward updateActiveState callback from ActiveState mixin
+- [ed0cf62](../../commit/ed0cf62) [removed] Router.PathState (use Router.CurrentPath instead)
+- [ed0cf62](../../commit/ed0cf62) [removed] Router.Transitions (use Router.Navigation instead)
+- [ed0cf62](../../commit/ed0cf62) [removed] Router.RouteLookup (because it was useless)
+- [ed0cf62](../../commit/ed0cf62) [added] `<Routes scrollBehavior="browser">` alias of "imitateBrowser"
+- [ed0cf62](../../commit/ed0cf62) [changed] `<Routes fixedPath>` => `<Routes initialPath>` will be useful for SSR
+
+
+v0.8.0 - Sat, 04 Oct 2014 05:39:02 GMT
+--------------------------------------
+
+- [d2aa7cb](../../commit/d2aa7cb) [added] `<Routes location="none">`
+- [637c0ac](../../commit/637c0ac) [added] `<Routes fixedPath>`
+- [f2bf4bd](../../commit/f2bf4bd) [removed] RouteStore
+- [f2bf4bd](../../commit/f2bf4bd) [added] Router.PathState for keeping track of the current URL path
+- [f2bf4bd](../../commit/f2bf4bd) [added] Router.RouteLookup for looking up routes
+- [f2bf4bd](../../commit/f2bf4bd) [added] Router.Transitions for transitioning to other routes
+- [f2bf4bd](../../commit/f2bf4bd) [added] Pluggable scroll behaviors
+- [f2bf4bd](../../commit/f2bf4bd) [changed] `<Routes preserveScrollPosition>` => `<Routes scrollBehavior>`
+- [f2bf4bd](../../commit/f2bf4bd) [removed] `<Route preserveScrollPosition>`
+- [f2bf4bd](../../commit/f2bf4bd) [removed] Router.transitionTo, Router.replaceWith, Router.goBack
+- [97dbf2d](../../commit/97dbf2d) [added] transition.wait(promise)
+- [3787179](../../commit/3787179) [changed] Transition retry now uses replaceWith.
+- [e0b708f](../../commit/e0b708f) [added] Ability to transitionTo absolute URLs
+- [c1493b5](../../commit/c1493b5) [changed] #259 support dots in named params
+- [a4ce7c8](../../commit/a4ce7c8) [changed] isActive is an instance method
+- [a4ce7c8](../../commit/a4ce7c8) [removed] `<Routes onActiveStateChange>`
+
+v0.7.0 - Tue, 02 Sep 2014 16:42:28 GMT
+--------------------------------------
+
+- [3796371](../../commit/3796371) [changed] Use Browserify to run specs
+- [0e649be](../../commit/0e649be) [changed] Use Browserify to build examples
+- [bb7b666](../../commit/bb7b666) [removed] .js files from repo root
+- [96122dd](../../commit/96122dd) [fixed] undefined Buffer in query strings
+
+
+v0.6.1 - Sun, 31 Aug 2014 03:21:20 GMT
+--------------------------------------
+
+- [7536d96](../../commit/7536d96) [fixed] warning on links w/o params
+
+
+v0.6.0 - Fri, 29 Aug 2014 20:58:36 GMT
+--------------------------------------
+
+- [2a75f3e](../../commit/2a75f3e) [added] query argument to willTransitionTo
+- [b7e21bb](../../commit/b7e21bb) [fixed] Window scrolling
+- [5864531](../../commit/5864531) [changed] Default `<Redirect from>` to *
+- [1064881](../../commit/1064881) [changed] paths to inherit parents
+- [79caf99](../../commit/79caf99) [added] `<DefaultRoute name>`
+- [25adcab](../../commit/25adcab) [fixed] Using HashLocation without a preceeding /
+- [a63c940](../../commit/a63c940) [added] `<NotFoundRoute>`
+- [d5bd656](../../commit/d5bd656) [changed] path matching algorithm
+- [6526e70](../../commit/6526e70) [removed] location="disabled"
+- [8d2f3ed](../../commit/8d2f3ed) [changed] `<Link/>`s to take params property
+- [2a85b74](../../commit/2a85b74) [changed] handler keys to be optional
+
+
 v0.5.3 - Tue, 26 Aug 2014 03:36:42 GMT
 --------------------------------------
 

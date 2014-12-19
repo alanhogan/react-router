@@ -1,41 +1,30 @@
-module.exports = function(config) {
+var glob = require('glob');
+
+module.exports = function (config) {
   config.set({
 
     basePath: '',
 
-    frameworks: ['mocha'],
+    frameworks: [ 'mocha', 'browserify' ],
 
-    files: [
-      'specs/main.js'
-    ],
+    files: glob.sync('modules/**/__tests__/*-test.js'),
 
     exclude: [],
 
     preprocessors: {
-      'specs/main.js': ['webpack']
+      'modules/**/__tests__/*-test.js': [ 'browserify' ]
     },
 
-    webpack: {
-      cache: true,
-      // TODO: figure out how to get source maps in here, none of this works
-      //devtool: {
-        //'inline-source-map': true,
-        //inlineSourceMap: true
-      //},
-      module: {
-        loaders: [
-          {test: /\.js$/, loader: 'jsx-loader'}
-        ]
-      }
+    browserify: {
+      debug: true,
+      watch: true,
+      transform: [
+        [ 'reactify', { 'es6': true } ],
+        'envify'
+      ]
     },
 
-    webpackServer: {
-      stats: {
-        colors: true
-      }
-    },
-
-    reporters: ['progress'],
+    reporters: [ 'progress' ],
 
     port: 9876,
 
@@ -45,17 +34,10 @@ module.exports = function(config) {
 
     autoWatch: true,
 
-    browsers: ['Chrome'],
+    browsers: [ 'Chrome' ],
 
     captureTimeout: 60000,
 
-    singleRun: false,
-
-    plugins: [
-      require("karma-mocha"),
-      require("karma-chrome-launcher"),
-      require("karma-firefox-launcher"),
-      require("karma-webpack")
-    ]
+    singleRun: false
   });
 };
